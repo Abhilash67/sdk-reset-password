@@ -27,16 +27,14 @@ export class AuthProvider {
     throw new Error("Method 'getAccessToken()' must be implemented");
   }
 
-  resetMfa() {
-    throw new Error("Method 'resetMfa()' must be implemented");
+  // ADDED: New abstract method for refresh token
+  refreshToken() {
+    throw new Error("Method 'refreshToken()' must be implemented");
   }
-
-  resetPassword() {
+  
+  // ADDED: New abstract method for password reset
+  resetPassword(email) {
     throw new Error("Method 'resetPassword()' must be implemented");
-  }
-
-  changeUserName() {
-    throw new Error("Method 'changeUserName()' must be implemented");
   }
 }
 
