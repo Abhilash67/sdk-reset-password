@@ -1,0 +1,100 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule, JsonPipe } from '@angular/common';
+import UniversalAuth from 'universal-sdk';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, JsonPipe],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
+})
+export class AppComponent implements OnInit {
+  authClient: any = null;
+  isAuthenticated: boolean = false;
+  isLoading: boolean = true;
+  userProfile: any = null;
+  
+  auth0Config = {
+    domain: 'dev-vfzstbs1dxkuagab.us.auth0.com',
+    clientId: 'CP6smmR7f8NVud69LolHjy8YWSPUZ7g0',
+    audience: 'https://dev-vfzstbs1dxkuagab.us.auth0.com/api/v2/', 
+    redirectUri: window.location.origin,
+  };
+  
+  async ngOnInit() {
+    await this.initializeAuth();
+  }
+  
+  async initializeAuth() {
+    try {
+      // Create auth client
+      this.authClient = await UniversalAuth.createAuthProvider(
+        'auth0',
+        this.auth0Config
+      );
+      
+      // Check authentication status
+      this.isAuthenticated = this.authClient.isAuthenticated();
+      
+      // If authenticated, get user profile
+      if (this.isAuthenticated) {
+        try {
+          this.userProfile = await this.authClient.getUserProfile();
+          console.log('User is logged in:', this.userProfile);
+        } catch (error) {
+          console.error('Error getting user profile:', error);
+        }
+      } else {
+        console.log('User is not logged in');
+      }
+    } catch (error) {
+      console.error('Auth initialization error:', error);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+  
+  async loginButton() {
+    if (!this.authClient) {
+      await this.initializeAuth();
+    }
+    
+    if (this.authClient) {
+      this.authClient.login();
+    }
+  }
+  
+  logout() {
+    if (this.authClient) {
+      this.authClient.logout();
+      this.isAuthenticated = false;
+      this.userProfile = null;
+    }
+  }
+  
+  resetPassword() {
+    if (!this.authClient) {
+      this.initializeAuth().then(() => {
+        this.sendResetPasswordEmail();
+      });
+    } else {
+      this.sendResetPasswordEmail();
+    }
+  }
+  
+  private async sendResetPasswordEmail() {
+    try {
+      // Most Auth0 SDKs provide a way to trigger password reset
+      // For Auth0, this typically redirects to their password reset page
+      await this.authClient.resetPassword({
+        connection: 'Username-Password-Authentication',
+        email: prompt('Please enter your email address:')
+      });
+      alert('Password reset email has been sent if the email is registered.');
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      alert('There was an error processing your request. Please try again.');
+    }
+  }
+}
