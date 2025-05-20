@@ -1,0 +1,21 @@
+<div style="padding: 20px">
+  <h1>Authentication Demo</h1>
+  <div *ngIf="isLoading">
+    <p>Loading...</p>
+  </div>
+  <div *ngIf="!isLoading">
+    <div *ngIf="!isAuthenticated">
+      <p>You are not logged in</p>
+      <button (click)="loginButton()">Login</button>
+      <button (click)="resetPassword()" style="margin-left: 10px">Reset Password</button>
+    </div>
+    <div *ngIf="isAuthenticated">
+      <p>Welcome! You are logged in</p>
+      <button (click)="logout()">Logout</button>
+      <div *ngIf="userProfile" style="margin-top: 20px">
+        <h3>User Profile:</h3>
+        <pre>{{ userProfile | json }}</pre>
+      </div>
+    </div>
+  </div>
+</div>
